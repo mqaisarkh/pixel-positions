@@ -11,4 +11,7 @@
         'Segoe UI Symbol', 'Noto Color Emoji';
         
         --color-black: #060606;
+
+        --font-hanken-grotesk:hanken-grotesk, sans-serif;
+        --text-2xs: 10px;
 }
