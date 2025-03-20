@@ -6,6 +6,10 @@ use App\Models\job;
 use App\Http\Requests\StorejobRequest;
 use App\Http\Requests\UpdatejobRequest;
 use App\Models\Tag;
+use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class JobController extends Controller
 {
@@ -14,11 +18,11 @@ class JobController extends Controller
      */
     public function index()
     {
-        $jobs = Job::all()->groupBy('featured');
+        $jobs = Job::latest()->with(['employer', 'tags'])->get()->groupBy('featured');
     
         return view('jobs.index', [
-            'featuredJobs' => $jobs[0],
-            'jobs' => $jobs[1],
+            'jobs' => $jobs[0],
+            'featuredJobs' => $jobs[1],
             'tags' => Tag::all(),
         ]);
     }
@@ -28,46 +32,37 @@ class JobController extends Controller
      */
     public function create()
     {
-        //
+        return view('jobs.create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorejobRequest $request)
+    public function store(Request $request)
     {
-        //
+        $attributes = $request->validate([
+            'title'       => ['required'],
+            'salary'      => ['required'],
+            'location'    => ['required'],
+            'schedule'    => ['required', Rule::in(['Part Time', 'Full Time'])],
+            'url'         => ['required', 'active_url'],
+            'tags'        => ['nullable'],
+        ]);
+
+        $attributes['featured'] = $request->has('featured');
+
+        $job = Auth::user()->employer->jobs()->create(Arr::except($attributes, 'tags'));
+
+        if ($attributes['tags'] ?? false) {
+           foreach (explode(',', $attributes['tags']) as $tag) {
+            $job->tag($tag);
+           }
+        }
+        return redirect('/');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(job $job)
+    public function show(Job $job)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(job $job)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdatejobRequest $request, job $job)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(job $job)
-    {
-        //
+        return view('jobs.show', ['job' => $job]);
     }
 }
