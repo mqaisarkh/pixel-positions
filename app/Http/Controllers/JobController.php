@@ -6,9 +6,11 @@ use App\Models\job;
 use App\Http\Requests\StorejobRequest;
 use App\Http\Requests\UpdatejobRequest;
 use App\Models\Tag;
+use Attribute;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
 class JobController extends Controller
@@ -64,5 +66,37 @@ class JobController extends Controller
     public function show(Job $job)
     {
         return view('jobs.show', ['job' => $job]);
+    }
+
+    public function edit(Job $job)
+    {
+
+        return view('jobs.edit', ['job' => $job]);
+    }
+
+
+    public function update(Request $request, Job $job)
+    {
+        $attributes = $request->validate([
+            'title'    => ['required'],
+            'salary'   => ['required'],
+            'location' => ['required'],
+            'schedule' => ['required', Rule::in(['Part Time', 'Full Time'])],
+            'url'      => ['required', 'active_url'],
+            'tags'     => ['nullable'],
+        ]);
+
+        $attributes['featured'] = $request->has('featured');
+
+        $job->update(Arr::except($attributes, 'tags'));
+
+        if ($attributes['tags'] ?? false) {
+            $job->tags()->detach();
+            foreach (explode(',', $attributes['tags']) as $tag) {
+                $job->tag($tag);
+            }
+        }
+
+        return redirect()->route('jobs.show', $job->id);
     }
 }

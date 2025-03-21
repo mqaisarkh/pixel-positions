@@ -11,7 +11,11 @@ Route::get('/', [JobController::class, 'index']);
 
 Route::get('/jobs/create', [JobController::class, 'create'])->middleware('auth');
 Route::post('/jobs', [JobController::class, 'store'])->middleware('auth');
-Route::get('/jobs/{job}', [JobController::class, 'show'])->middleware('auth');
+Route::get('/jobs/{job}', [JobController::class, 'show'])->middleware('auth')->name('jobs.show');
+Route::get('/jobs/{job}/edit', [JobController::class, 'edit'])->middleware('auth');
+Route::patch('/jobs/{job}', [JobController::class, 'update'])->name('jobs.update');
+
+
 
 Route::get('/search', SearchController::class);
 Route::get('/tags/{tag:name}', TagController::class);
