@@ -1,6 +1,16 @@
 <x-layout>
     <div class="space-y-10">
-
+        
+            @if(session('success'))
+                <div class="w-1/2 bg-green-500 text-white px-4 py-2 rounded-md text-center">
+                    {{ session('success') }}
+                </div>
+            @endif
+            @if(session('posted'))
+                <div class="w-1/2 bg-green-500 text-white px-4 py-2 rounded-md text-center">
+                    {{ session('posted') }}
+                </div>
+            @endif
         <section class="text-center pt-6">
             <h1 class="font-bold text-4xl ">Let's Find Your Next Job</h1>
 

@@ -7,13 +7,14 @@ use App\Http\Controllers\SessionController;
 use App\Http\Controllers\TagController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [JobController::class, 'index']);
+Route::get('/', [JobController::class, 'index'])->name('home');
 
 Route::get('/jobs/create', [JobController::class, 'create'])->middleware('auth');
 Route::post('/jobs', [JobController::class, 'store'])->middleware('auth');
 Route::get('/jobs/{job}', [JobController::class, 'show'])->middleware('auth')->name('jobs.show');
-Route::get('/jobs/{job}/edit', [JobController::class, 'edit'])->middleware('auth');
-Route::patch('/jobs/{job}', [JobController::class, 'update'])->name('jobs.update');
+Route::get('/jobs/{job}/edit', [JobController::class, 'edit'])->middleware('auth')->name('jobs.edit');
+Route::patch('/jobs/{job}', [JobController::class, 'update'])->middleware('auth')->name('jobs.update');
+Route::delete('/jobs/{job}', [JobController::class, 'destroy'])->middleware('auth')->name('jobs.destroy');
 
 
 

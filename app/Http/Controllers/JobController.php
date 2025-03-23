@@ -3,15 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\job;
-use App\Http\Requests\StorejobRequest;
-use App\Http\Requests\UpdatejobRequest;
 use App\Models\Tag;
-use Attribute;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
+use Monolog\Processor\WebProcessor;
 
 class JobController extends Controller
 {
@@ -60,7 +58,7 @@ class JobController extends Controller
             $job->tag($tag);
            }
         }
-        return redirect('/');
+        return redirect()->route('home')->with('posted', 'Job posted successfully.');
     }
 
     public function show(Job $job)
@@ -70,8 +68,11 @@ class JobController extends Controller
 
     public function edit(Job $job)
     {
+        // authorize
+        Gate::authorize('edit', $job);
 
-        return view('jobs.edit', ['job' => $job]);
+        // redirect
+        return view('jobs.edit', ['job' =>$job]);
     }
 
 
@@ -97,6 +98,21 @@ class JobController extends Controller
             }
         }
 
-        return redirect()->route('jobs.show', $job->id);
+        return redirect()->route('jobs.show', $job->id)
+        ->with('updated', 'Job updated successfully.');
     }
+
+    
+    public function destroy(Job $job)
+    {
+        // authorize
+        Gate::authorize('destroy', $job);
+
+        // delete the job
+        $job->delete();
+
+        // redirect
+        return redirect()->route('home')->with('success', 'Job deleted successfully.');
+    }
+
 }

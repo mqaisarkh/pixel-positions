@@ -24,7 +24,7 @@
                 <a href="/">Salaries</a>
                 <a href="/">Companies</a>
             </div>
-
+            
             @auth
                 <div class="space-x-6 font-bold flex">
                     <a href="/jobs/create">Post a Job</a>
